@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Daily Briefing · 2026-05-27</title>
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --bg-elev: #ffffff;
+    --bg-sunken: #f0efec;
+    --border: #e7e5e0;
+    --border-strong: #d4d2cc;
+    --text: #1c1b18;
+    --text-muted: #6b6862;
+    --text-soft: #94918a;
+    --accent: #1c1b18;
+    --p1: #c2410c;
+    --p1-bg: #fff1ea;
+    --p1-border: #f5cbb3;
+    --p2: #b45309;
+    --p2-bg: #fef6e7;
+    --p2-border: #f1d9a4;
+    --p3: #65706a;
+    --p3-bg: #f1f1ee;
+    --p3-border: #d9d8d2;
+    --done: #4d7c5a;
+    --done-bg: #eef5ef;
+    --shadow-sm: 0 1px 2px rgba(20, 20, 18, 0.04);
+    --shadow-md: 0 1px 3px rgba(20, 20, 18, 0.04), 0 4px 12px rgba(20, 20, 18, 0.04);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  [data-theme="dark"] {
+    --bg: #161513;
+    --bg-elev: #1f1e1b;
+    --bg-sunken: #121110;
+    --border: #2c2a26;
+    --border-strong: #3a3833;
+    --text: #ecebe7;
+    --text-muted: #9b988f;
+    --text-soft: #6b6862;
+    --accent: #ecebe7;
+    --p1: #ff8a5b;
+    --p1-bg: #2a1610;
+    --p1-border: #4a2818;
+    --p2: #f0b860;
+    --p2-bg: #261d10;
+    --p2-border: #463618;
+    --p3: #a8b0aa;
+    --p3-bg: #1d1d1b;
+    --p3-border: #34332f;
+    --done: #7faf8c;
+    --done-bg: #142019;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
+    --shadow-md: 0 1px 3px rgba(0,0,0,.3), 0 4px 12px rgba(0,0,0,.2);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+  a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--border-strong); }
+  a:hover { border-bottom-color: var(--text); }
+  code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; }
+
+  /* ─── Layout ─── */
+  .shell { max-width: 1080px; margin: 0 auto; padding: 28px 32px 96px; }
+
+  /* ─── Top bar ─── */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 24px; border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .topbar .brand { font-weight: 600; letter-spacing: -0.01em; }
+  .topbar .brand .dot {
+    display: inline-block; width: 7px; height: 7px; background: var(--p1);
+    border-radius: 50%; margin-right: 10px; vertical-align: middle;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .topbar .actions { display: flex; gap: 8px; align-items: center; }
+  .iconbtn {
+    width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text-muted); cursor: pointer; transition: all .15s;
+  }
+  .iconbtn:hover { color: var(--text); border-color: var(--border-strong); background: var(--bg-elev); }
+  .clock { font-variant-numeric: tabular-nums; color: var(--text-muted); font-size: 13px; margin-right: 4px; }
+
+  /* ─── Header ─── */
+  .head h1 { font-size: 32px; letter-spacing: -0.025em; font-weight: 600; margin: 0 0 6px; }
+  .head .sub { color: var(--text-muted); margin: 0 0 20px; font-size: 15px; }
+  .tldr {
+    padding: 16px 18px; background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: var(--radius); margin: 0 0 28px; color: var(--text);
+    box-shadow: var(--shadow-sm);
+    font-size: 14.5px;
+  }
+  .tldr b { font-weight: 600; }
+
+  /* ─── Stat tiles ─── */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 32px; }
+  .stat {
+    background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px; box-shadow: var(--shadow-sm);
+    cursor: pointer; transition: all .15s; position: relative;
+  }
+  .stat:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .stat[aria-pressed="true"] { border-color: var(--text); }
+  .stat .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+  .stat .num { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
+  .stat .hint { font-size: 12px; color: var(--text-soft); }
+  .stat .pip { position: absolute; top: 14px; right: 14px; width: 8px; height: 8px; border-radius: 50%; }
+  .stat[data-priority="p1"] .pip { background: var(--p1); }
+  .stat[data-priority="p2"] .pip { background: var(--p2); }
+  .stat[data-priority="p3"] .pip { background: var(--p3); }
+  .stat[data-priority="all"] .pip { background: var(--text-muted); }
+
+  /* ─── Filter bar ─── */
+  .filterbar { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
+  .search {
+    flex: 1; min-width: 200px; padding: 9px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--bg-elev); color: var(--text);
+    font-size: 13.5px; font-family: inherit; outline: none; transition: border-color .15s;
+  }
+  .search:focus { border-color: var(--text); }
+  .togglepill {
+    padding: 7px 12px; font-size: 12.5px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--bg-elev); color: var(--text-muted);
+    cursor: pointer; user-select: none; transition: all .15s; font-family: inherit;
+  }
+  .togglepill[aria-pressed="true"] { color: var(--text); border-color: var(--text); background: var(--bg-elev); }
+  .togglepill:hover { color: var(--text); }
+
+  /* ─── Sections ─── */
+  .section { margin-bottom: 36px; }
+  .section-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 14px; padding-bottom: 8px;
+  }
+  .section-head .title { display: flex; align-items: baseline; gap: 10px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .section-head .title .swatch { width: 10px; height: 10px; border-radius: 3px; }
+  .section[data-priority="p1"] .swatch { background: var(--p1); }
+  .section[data-priority="p2"] .swatch { background: var(--p2); }
+  .section[data-priority="p3"] .swatch { background: var(--p3); }
+  .section-head .count { color: var(--text-soft); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+  /* ─── Cards ─── */
+  .card {
+    background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 18px; margin-bottom: 10px; box-shadow: var(--shadow-sm);
+    transition: all .2s; position: relative;
+  }
+  .card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+  .card[data-done="true"] { opacity: 0.5; }
+  .card[data-done="true"] .card-title { text-decoration: line-through; text-decoration-color: var(--text-soft); }
+  .card[data-snoozed="true"] { opacity: 0.4; border-style: dashed; }
+  .card.hidden { display: none; }
+
+  .card-row { display: flex; gap: 12px; align-items: flex-start; }
+  .card-check {
+    appearance: none; -webkit-appearance: none; margin: 2px 0 0;
+    width: 18px; height: 18px; border: 1.5px solid var(--border-strong);
+    border-radius: 5px; background: var(--bg-elev); cursor: pointer;
+    transition: all .15s; flex-shrink: 0; position: relative;
+  }
+  .card-check:hover { border-color: var(--text); }
+  .card-check:checked { background: var(--done); border-color: var(--done); }
+  .card-check:checked::after {
+    content: ""; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px;
+    border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+  .card-body { flex: 1; min-width: 0; }
+  .card-title { font-size: 15px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.005em; }
+  .card-meta {
+    display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px;
+    color: var(--text-muted); margin-bottom: 10px;
+  }
+  .card-meta .who { font-weight: 500; color: var(--text); }
+  .card-meta .tag {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px;
+    color: var(--text-muted);
+  }
+  .card-meta .badge {
+    padding: 1px 7px; font-size: 11px; font-weight: 500; border-radius: 4px;
+    background: var(--bg-sunken); color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .card-meta .badge.warn { background: var(--p1-bg); color: var(--p1); border-color: var(--p1-border); }
+  .card-body p { margin: 0 0 10px; color: var(--text); font-size: 14px; }
+  .card-body code { background: var(--bg-sunken); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border); }
+  .card-body pre {
+    background: var(--bg-sunken); padding: 10px 12px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); font-size: 12px; overflow-x: auto; margin: 0 0 10px;
+    line-height: 1.45;
+  }
+  .actions-list { list-style: none; padding: 0; margin: 8px 0 0; }
+  .actions-list li {
+    display: flex; align-items: flex-start; gap: 8px; padding: 5px 0;
+    font-size: 13.5px; color: var(--text);
+  }
+  .actions-list input[type="checkbox"] {
+    appearance: none; -webkit-appearance: none; margin: 3px 0 0; width: 14px; height: 14px;
+    border: 1.5px solid var(--border-strong); border-radius: 4px;
+    background: var(--bg-elev); cursor: pointer; flex-shrink: 0; position: relative;
+    transition: all .15s;
+  }
+  .actions-list input[type="checkbox"]:hover { border-color: var(--text); }
+  .actions-list input[type="checkbox"]:checked { background: var(--done); border-color: var(--done); }
+  .actions-list input[type="checkbox"]:checked::after {
+    content: ""; position: absolute; left: 3px; top: 0px; width: 4px; height: 8px;
+    border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+  .actions-list input[type="checkbox"]:checked + span { text-decoration: line-through; color: var(--text-muted); }
+
+  .card-foot {
+    display: flex; gap: 6px; margin-top: 12px; padding-top: 10px;
+    border-top: 1px dashed var(--border); align-items: center;
+  }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px;
+    font-size: 12px; color: var(--text-muted); background: transparent;
+    cursor: pointer; font-family: inherit; transition: all .15s;
+  }
+  .chip:hover { color: var(--text); border-color: var(--border-strong); background: var(--bg-sunken); }
+  .chip.danger:hover { color: var(--p1); border-color: var(--p1-border); background: var(--p1-bg); }
+
+  /* ─── P3 list ─── */
+  .fyi-list { list-style: none; padding: 0; margin: 0; }
+  .fyi-list li {
+    padding: 10px 14px; background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); margin-bottom: 6px; font-size: 13.5px;
+    display: flex; gap: 10px; align-items: center;
+  }
+  .fyi-list li .who { font-weight: 500; min-width: 180px; color: var(--text); }
+  .fyi-list li .desc { color: var(--text-muted); flex: 1; }
+
+  /* ─── Footer ─── */
+  .footer {
+    margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border);
+    color: var(--text-soft); font-size: 12px; display: flex; justify-content: space-between;
+  }
+  .footer code { font-size: 11.5px; color: var(--text-muted); }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 999px;
+    font-size: 13px; box-shadow: var(--shadow-md); opacity: 0; pointer-events: none;
+    transition: all .2s; z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 720px) {
+    .shell { padding: 20px 18px 64px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .head h1 { font-size: 26px; }
+    .fyi-list li { flex-direction: column; align-items: flex-start; gap: 2px; }
+    .fyi-list li .who { min-width: 0; }
+  }
+
+  /* ─── Keyboard hint ─── */
+  kbd {
+    display: inline-block; padding: 1px 6px; font-family: ui-monospace, monospace;
+    font-size: 11px; background: var(--bg-sunken); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>Daily Briefing</div>
+    <div class="actions">
+      <span class="clock" id="clock">—</span>
+      <button class="iconbtn" id="theme" title="Toggle theme (t)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="iconbtn" id="reset" title="Reset all (shift+r)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="head">
+    <h1>Wednesday, May 27</h1>
+    <p class="sub">Tech Lead briefing · synthesized from Outlook + Teams · last 24h</p>
+    <div class="tldr">
+      Heavy <b>Floor Scale / GPG-50</b> day. Loose ends on <b>US 848858</b> — yard &amp; deductions weren't covered in yesterday's demo, and Kurt left overnight follow-ups. A live customer issue at <b>2MRessources</b> is unowned. <b>Patch 2</b> release scope is locked.
+    </div>
+  </div>
+
+  <div class="stats">
+    <button class="stat" data-priority="all" aria-pressed="true">
+      <span class="pip"></span>
+      <div class="label">All</div>
+      <div class="num">15</div>
+      <div class="hint">46 reviewed · 21 ✉ · 25 💬</div>
+    </button>
+    <button class="stat" data-priority="p1">
+      <span class="pip"></span>
+      <div class="label">P1 · Act today</div>
+      <div class="num">3</div>
+      <div class="hint">15 – 60 min</div>
+    </button>
+    <button class="stat" data-priority="p2">
+      <span class="pip"></span>
+      <div class="label">P2 · Should</div>
+      <div class="num">5</div>
+      <div class="hint">25 – 60 min</div>
+    </button>
+    <button class="stat" data-priority="p3">
+      <span class="pip"></span>
+      <div class="label">P3 · FYI</div>
+      <div class="num">7</div>
+      <div class="hint">monitor only</div>
+    </button>
+  </div>
+
+  <div class="filterbar">
+    <input type="search" class="search" id="search" placeholder="Filter — type to search title, sender, or content" />
+    <button class="togglepill" id="hideDone" aria-pressed="false">Hide done</button>
+    <button class="togglepill" id="hideSnoozed" aria-pressed="true">Hide snoozed</button>
+  </div>
+
+  <!-- P1 -->
+  <div class="section" data-priority="p1">
+    <div class="section-head">
+      <div class="title"><span class="swatch"></span>P1 · Act today</div>
+      <div class="count" data-counter="p1">3 items</div>
+    </div>
+
+    <div class="card" data-id="p1-1" data-priority="p1">
+      <div class="card-row">
+        <input type="checkbox" class="card-check" data-action="done" />
+        <div class="card-body">
+          <div class="card-title">Floor Scale demo follow-up — US 848858</div>
+          <div class="card-meta">
+            <span class="who">Paul MacDonald &amp; Kurt Aaron Cabrera</span>
+            <span class="tag">Teams DM</span>
+            <span class="badge">5–30 min</span>
+          </div>
+          <p>Paul flagged the demo didn't cover <b>yard &amp; deductions</b>. Clicking those should now open the option pop-up, not the RHS buttons. Kurt left overnight messages (23:08 → 01:39 UTC) explaining the RHS buttons appeared because all feature flags were on locally; he offered to re-demo with the flag off and has an unanswered PR mention.</p>
+          <ul class="actions-list">
+            <li><input type="checkbox" data-action="subtask" /><span>Confirm with Paul whether a second demo (flag off) is needed</span></li>
+            <li><input type="checkbox" data-action="subtask" /><span>Reply to Kurt's PR mention before his day starts</span></li>
+          </ul>
+          <div class="card-foot">
+            <a class="chip" href="https://dev.azure.com/amcsgroup/Platform/_workitems/edit/848858" target="_blank">↗ US 848858</a>
+            <a class="chip" href="#" target="_blank">↗ Teams thread</a>
+            <button class="chip" data-action="snooze">⏰ Snooze 1 day</button>
+            <button class="chip danger" data-action="escalate">🚩 Escalate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="p1-2" data-priority="p1">
+      <div class="card-row">
+        <input type="checkbox" class="card-check" data-action="done" />
+        <div class="card-body">
+          <div class="card-title">2MRessources Live — Guided Scale recall error</div>
+          <div class="card-meta">
+            <span class="who">John Neigel</span>
+            <span class="tag">Teams</span>
+            <span class="badge">5–30 min</span>
+            <span class="badge warn">⚠ customer on LIVE</span>
+          </div>
+          <p>Multiple <code>TIK1100</code> tickets created without a Vehicle Registration. Recalling a staged ticket throws an error on:</p>
+          <pre>GET /scale/api/guidedScale/SummaryEditorDatas/
+    ?filter= WeighingId eq 81
+        and  WeighingTypeId eq 2
+        and  CompanyOutletLocationId eq 1</pre>
+          <p>John is correcting via WEB-Scale in the meantime.</p>
+          <ul class="actions-list">
+            <li><input type="checkbox" data-action="subtask" /><span>Triage and assign — shouldn't sit while John works around it</span></li>
+          </ul>
+          <div class="card-foot">
+            <a class="chip" href="#" target="_blank">↗ Teams thread</a>
+            <button class="chip" data-action="snooze">⏰ Snooze 1 day</button>
+            <button class="chip danger" data-action="escalate">🚩 Escalate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="p1-3" data-priority="p1">
+      <div class="card-row">
+        <input type="checkbox" class="card-check" data-action="done" />
+        <div class="card-body">
+          <div class="card-title">a5 feature flag — confirm with Aira</div>
+          <div class="card-meta">
+            <span class="who">Aira Pega</span>
+            <span class="tag">Teams</span>
+            <span class="badge">&lt; 5 min</span>
+          </div>
+          <p>Aira asked at <code>11:26 UTC</code>, you replied <i>"On now"</i> at <code>11:41 UTC</code>. No confirmation back.</p>
+          <ul class="actions-list">
+            <li><input type="checkbox" data-action="subtask" /><span>Verify the flag is live in a5</span></li>
+            <li><input type="checkbox" data-action="subtask" /><span>Reply to Aira to close the loop</span></li>
+          </ul>
+          <div class="card-foot">
+            <a class="chip" href="#" target="_blank">↗ Teams thread</a>
+            <button class="chip" data-action="snooze">⏰ Snooze 1 day</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P2 -->
+  <div class="section" data-priority="p2">
+    <div class="section-head">
+      <div class="title"><span class="swatch"></span>P2 · Should address today</div>
+      <div class="count" data-counter="p2">5 items</div>
+    </div>
+
+    <div class="card" data-id="p2-1" data-priority="p2">
+      <div class="card-row">
+        <input type="checkbox" class="card-check" data-action="done" />
+        <div class="card-body">
+          <div class="card-title">Patch 2 release scope — 2026-05 (19-21)</div>
+          <div class="card-meta">
+            <span class="who">Amitha Murthy · Sean Burke · David Hansen</span>
+            <span class="tag">Release scope meeting</span>
+          </div>
+          <p>In scope: Bug <a href="https://dev.azure.com/amcsgroup/Platform/_workitems/edit/851293" target="_blank">851293</a> (SIMS payment Card/Others), Bug <a href="https://dev.azure.com/amcsgroup/Platform/_workitems/edit/851281" target="_blank">851281</a> (Inventory Position), Bug <a href="https://dev.azure.com/amcsgroup/Platform/_workitems/edit/851365" target="_blank">851365</a> (Transaction Ledger), US <a href="https://dev.azure.com/amcsgroup/Platform/_workitems/edit/849277" target="_blank">849277</a>, <a href="https://dev.azure.com/amcsgroup/Platform/_workitems/edit/847820" target="_blank">847820</a>. L2/L3 envs available for demoing next week.</p>
+          <ul class="actions-list">
+            <li><input type="checkbox" data-action="subtask" /><span>Confirm assignments on your side</span></li>
+            <li><input type="checkbox" data-action="subtask" /><span>Align Kurt + team on which of these you own</span></li>
+          </ul>
+          <div class="card-foot">
+            <a class="chip" href="https://dev.azure.com/amcsgroup/Platform/_queries/query/800c9040-0287-4db7-9112-10aa81430f9e/" target="_blank">↗ Patch 2 board</a>
+            <button class="chip" data-action="snooze">⏰ Snooze 1 day</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="p2-2" data-priority="p2">
+      <div class="card-row">
+        <input type="checkbox" class="card-check" data-action="done" />
+        <div class="card-body">
+          <div class="card-title">Bug 850445 — Seal Sync Race / Incomplete BOL</div>
+          <div class="card-meta">
+            <span class="who">Graeme Sutters</span>
+            <span class="tag">ADO Wiki</span>
+            <span class="badge">3 revisions</span>
+          </div>
+          <p>Graeme updated the bug-analysis wiki yesterday. Worth reading before any sync about this bug (Sims Metal Management).</p>
+          <div class="card-foot">
+            <a class="chip" href="#" target="_blank">↗ Wiki page</a>
+            <a class="chip" href="#" target="_blank">↗ Bug 850445</a>
+            <button class="chip" data-action="snooze">⏰ Snooze 1 day</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="p2-3" data-priority="p2">
+      <div class="card-row">
+        <input type="checkbox" class="card-check" data-action="done" />
+        <div class="card-body">
+          <div class="card-title">a3-dev deployment failure</div>
+          <div class="card-meta">
+            <span class="who">Venu Shankar</span>
+            <span class="tag">Software Dev channel</span>
+            <span class="badge">&lt; 5 min</span>
+          </div>
+          <p>Venu pinged the channel about a deployment error in a3-dev. No indication yet whether anyone has picked it up.</p>
+          <div class="card-foot">
+            <a class="chip" href="#" target="_blank">↗ Channel thread</a>
+            <button class="chip" data-action="snooze">⏰ Snooze 1 day</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="p2-4" data-priority="p2">
+      <div class="card-row">
+        <input type="checkbox" class="card-check" data-action="done" />
+        <div class="card-body">
+          <div class="card-title">Hyperscale dev-env refresh procedure</div>
+          <div class="card-meta">
+            <span class="who">Muthu Kumar</span>
+            <span class="tag">Team Leads · QA_GRP</span>
+          </div>
+          <p>Guidance for refreshing a dev environment using a customer DB that runs on Hyperscale. Reference material — worth sharing with the team.</p>
+          <div class="card-foot">
+            <a class="chip" href="#" target="_blank">↗ Channel post</a>
+            <button class="chip" data-action="snooze">⏰ Snooze 1 day</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="p2-5" data-priority="p2">
+      <div class="card-row">
+        <input type="checkbox" class="card-check" data-action="done" />
+        <div class="card-body">
+          <div class="card-title">HTTPS-only enforcement</div>
+          <div class="card-meta">
+            <span class="who">General channel · security compliance</span>
+            <span class="tag">2 mentions</span>
+          </div>
+          <p>Ongoing security compliance programme — HTTPS-only being enforced on relevant endpoints. Confirm any services you own are compliant.</p>
+          <div class="card-foot">
+            <a class="chip" href="#" target="_blank">↗ Channel post</a>
+            <button class="chip" data-action="snooze">⏰ Snooze 1 day</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P3 -->
+  <div class="section" data-priority="p3">
+    <div class="section-head">
+      <div class="title"><span class="swatch"></span>P3 · FYI</div>
+      <div class="count" data-counter="p3">7 items</div>
+    </div>
+    <ul class="fyi-list">
+      <li data-id="p3-1" data-priority="p3"><span class="who">Geraldine de la Cerna</span><span class="desc">OOO today (May 27)</span></li>
+      <li data-id="p3-2" data-priority="p3"><span class="who">Paul MacDonald</span><span class="desc">Accepted · Shipper's Weights on Inbound Load – spec &amp; prototype [754627]</span></li>
+      <li data-id="p3-3" data-priority="p3"><span class="who">Pangkaj · Geraldine · Graeme</span><span class="desc">Accepted · Shipper's Weights on Inbound Transactions Log [844923]</span></li>
+      <li data-id="p3-4" data-priority="p3"><span class="who">Metals Team</span><span class="desc">Teams meeting scheduled · Demo for 847385</span></li>
+      <li data-id="p3-5" data-priority="p3"><span class="who">Azure DevOps</span><span class="desc">Build succeeded · scale_ui_ci #9.10.5-develop</span></li>
+      <li data-id="p3-6" data-priority="p3"><span class="who">Azure DevOps</span><span class="desc">Paul &amp; Kurt @-mentioned you on US 848858 <i>(handled in P1)</i></span></li>
+      <li data-id="p3-7" data-priority="p3"><span class="who">Ingo Hansen</span><span class="desc">DM · "For the pickleball fans" · social</span></li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <div>
+      State persists locally · Keyboard: <kbd>t</kbd> theme · <kbd>/</kbd> search · <kbd>shift+R</kbd> reset
+    </div>
+    <div><code>.briefing-log/history.md · claude/wizardly-meitner-1NNPb</code></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const KEY = 'briefing-state-2026-05-27';
+  const THEME_KEY = 'briefing-theme';
+
+  // ─── State ─────────────────────────────────────────────────────────
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
+  const save = s => localStorage.setItem(KEY, JSON.stringify(s));
+  let state = load();
+
+  // ─── Theme ─────────────────────────────────────────────────────────
+  const setTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem(THEME_KEY, t);
+  };
+  const savedTheme = localStorage.getItem(THEME_KEY);
+  if (savedTheme) setTheme(savedTheme);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+
+  document.getElementById('theme').addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+  });
+
+  // ─── Clock ─────────────────────────────────────────────────────────
+  const clockEl = document.getElementById('clock');
+  const tick = () => {
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mm = String(d.getMinutes()).padStart(2,'0');
+    clockEl.textContent = `${hh}:${mm}`;
+  };
+  tick(); setInterval(tick, 30000);
+
+  // ─── Cards & actions ───────────────────────────────────────────────
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(card => {
+    const id = card.dataset.id;
+    const s = state[id] || {};
+
+    if (s.done) { card.dataset.done = 'true'; card.querySelector('[data-action="done"]').checked = true; }
+    if (s.snoozed) card.dataset.snoozed = 'true';
+    (s.subtasks || []).forEach((v, i) => {
+      const cb = card.querySelectorAll('[data-action="subtask"]')[i];
+      if (cb && v) { cb.checked = true; }
+    });
+
+    card.querySelector('[data-action="done"]').addEventListener('change', e => {
+      state[id] = state[id] || {};
+      state[id].done = e.target.checked;
+      card.dataset.done = e.target.checked ? 'true' : 'false';
+      save(state);
+      updateCounts(); applyFilters();
+      toast(e.target.checked ? `✓ Marked done` : `Unmarked`);
+    });
+
+    card.querySelectorAll('[data-action="subtask"]').forEach((cb, i) => {
+      cb.addEventListener('change', () => {
+        state[id] = state[id] || {};
+        state[id].subtasks = state[id].subtasks || [];
+        state[id].subtasks[i] = cb.checked;
+        save(state);
+      });
+    });
+
+    const snoozeBtn = card.querySelector('[data-action="snooze"]');
+    if (snoozeBtn) snoozeBtn.addEventListener('click', () => {
+      state[id] = state[id] || {};
+      state[id].snoozed = !state[id].snoozed;
+      card.dataset.snoozed = state[id].snoozed ? 'true' : 'false';
+      save(state);
+      applyFilters();
+      toast(state[id].snoozed ? '⏰ Snoozed to tomorrow' : 'Un-snoozed');
+    });
+
+    const escBtn = card.querySelector('[data-action="escalate"]');
+    if (escBtn) escBtn.addEventListener('click', () => {
+      toast('🚩 Escalated — flag carried into tomorrow\'s briefing');
+      state[id] = state[id] || {};
+      state[id].escalated = true;
+      save(state);
+    });
+  });
+
+  // ─── Filters ───────────────────────────────────────────────────────
+  let priorityFilter = 'all';
+  let query = '';
+  let hideDone = false;
+  let hideSnoozed = true;
+
+  document.querySelectorAll('.stat').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.stat').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      priorityFilter = btn.dataset.priority;
+      applyFilters();
+    });
+  });
+
+  document.getElementById('search').addEventListener('input', e => {
+    query = e.target.value.trim().toLowerCase();
+    applyFilters();
+  });
+
+  const hideDoneBtn = document.getElementById('hideDone');
+  hideDoneBtn.addEventListener('click', () => {
+    hideDone = !hideDone;
+    hideDoneBtn.setAttribute('aria-pressed', hideDone);
+    applyFilters();
+  });
+  const hideSnoozedBtn = document.getElementById('hideSnoozed');
+  hideSnoozedBtn.addEventListener('click', () => {
+    hideSnoozed = !hideSnoozed;
+    hideSnoozedBtn.setAttribute('aria-pressed', hideSnoozed);
+    applyFilters();
+  });
+
+  const applyFilters = () => {
+    const allItems = document.querySelectorAll('[data-priority][data-id]');
+    allItems.forEach(item => {
+      const p = item.dataset.priority;
+      const text = item.innerText.toLowerCase();
+      const isDone = item.dataset.done === 'true';
+      const isSnoozed = item.dataset.snoozed === 'true';
+
+      let show = true;
+      if (priorityFilter !== 'all' && p !== priorityFilter) show = false;
+      if (query && !text.includes(query)) show = false;
+      if (hideDone && isDone) show = false;
+      if (hideSnoozed && isSnoozed) show = false;
+
+      item.classList.toggle('hidden', !show);
+    });
+
+    // Hide whole sections if empty after filter
+    document.querySelectorAll('.section').forEach(sec => {
+      const visible = sec.querySelectorAll('[data-id]:not(.hidden)').length;
+      sec.style.display = visible ? '' : 'none';
+    });
+  };
+
+  const updateCounts = () => {
+    ['p1','p2','p3'].forEach(p => {
+      const total = document.querySelectorAll(`.section[data-priority="${p}"] [data-id]`).length;
+      const done = document.querySelectorAll(`.section[data-priority="${p}"] [data-id][data-done="true"]`).length;
+      const el = document.querySelector(`[data-counter="${p}"]`);
+      if (el) el.textContent = done ? `${total - done} of ${total} remaining` : `${total} items`;
+    });
+  };
+
+  // ─── Reset ─────────────────────────────────────────────────────────
+  document.getElementById('reset').addEventListener('click', () => {
+    if (!confirm('Reset all checks, snoozes, and escalations for today?')) return;
+    localStorage.removeItem(KEY);
+    state = {};
+    location.reload();
+  });
+
+  // ─── Keyboard ──────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      if (e.key === 'Escape') e.target.blur();
+      return;
+    }
+    if (e.key === 't') { document.getElementById('theme').click(); }
+    if (e.key === '/') { e.preventDefault(); document.getElementById('search').focus(); }
+    if (e.key === 'R' && e.shiftKey) { document.getElementById('reset').click(); }
+  });
+
+  // ─── Toast ─────────────────────────────────────────────────────────
+  const toastEl = document.getElementById('toast');
+  let toastT;
+  const toast = (msg) => {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => toastEl.classList.remove('show'), 1800);
+  };
+
+  applyFilters();
+  updateCounts();
+})();
+</script>
+</body>
+</html>
