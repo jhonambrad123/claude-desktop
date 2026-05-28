@@ -18,7 +18,7 @@ A single **live artifact** titled "Daily Briefing" — a persistent, interactive
 
 Look for a `<script type="application/json" id="briefing-state">` block in the current artifact. If present, parse it for:
 
-- Yesterday's P1/P2 items with their done / snoozed / escalated flags
+- Yesterday's items with their done / snoozed / escalated flags
 - A rolling 14-day log of items (for cross-referencing recurring threads)
 
 If no prior state exists, treat this as the first run.
@@ -37,61 +37,90 @@ If no prior state exists, treat this as the first run.
 
 If a connector fails, render a red banner at the top of the artifact naming the failed source — don't silently produce an empty dashboard.
 
-### Step 3 — Prioritize
+### Step 3 — Categorize by action verb
 
-| Tier | Meaning |
-|---|---|
-| 🔴 **P1 — Act today** | Blocks others, hard deadline today/tomorrow, production incident, client waiting, escalation |
-| 🟠 **P2 — Should address today** | Decisions I need to make, discussions to weigh in on, tasks to move forward |
-| 🟡 **P3 — Monitor / FYI** | Status updates, newsletters, CC'd threads, no action needed |
-| ⚫ **Noise — Skip** | Automated notifications, meeting confirmations, marketing, low-signal |
+Sort every item into one of five lanes based on **what kind of work it requires** — not how urgent it is.
 
-Within P1 and P2, tag each item with a time estimate: `< 5 min` · `5–30 min` · `> 30 min`.
+| Lane | Means | Examples |
+|---|---|---|
+| 🔥 **Unblock** | Someone's waiting on me — team, customer, stakeholder | "Can you turn on flag X?" · production incident · deploy failure · approval pending |
+| ↩️ **Respond** | A conversation thread needs my reply or follow-up | "How should we handle Y?" · async question · review feedback · @-mention |
+| ⚖️ **Decide** | A call only I can make — scope, design, priority, ownership | Release scope alignment · trade-off discussions · architectural choice |
+| 👁 **Review** | Code, docs, designs, analyses to look at and weigh in on | PR · wiki page · spec · post-mortem |
+| 📰 **Aware** | Keep on the radar — no action expected | OOO notices · build results · org-wide announcements · social |
 
-### Step 4 — Cross-reference with prior state
+⚫ **Skip noise** — automated notifications, meeting confirmations, marketing, low-signal threads. Don't render these.
 
-For each P1/P2:
-- If the item appeared in a previous run → mark `carryOver: true`, include the date it first appeared
-- If a prior P1/P2 isn't in today's new messages but wasn't marked done → keep it visible under "Ongoing threads," mark `unresolved: true`
+### Step 4 — Tag with urgency badges (orthogonal to lane)
+
+Urgency is a *badge on the card*, not the lane. Apply any that fit:
+
+- 🚨 **Customer-impacting** — production / live environment issue
+- 🔴 **Hot** — hard deadline today/tomorrow, incident active, escalation
+- ⏱ **Time estimate** — `< 5 min` · `5–30 min` · `> 30 min`
+- ↻ **Carry-over** — appeared in a prior briefing (include date first seen)
+- ⏰ **Snoozed** — user deferred yesterday
+- 🚩 **Escalated** — user flagged for extra visibility
+
+### Step 5 — Cross-reference with prior state
+
+For each item:
+- If it appeared in a previous run → tag `carryOver: true` with the date first seen
+- If a prior item isn't in today's new messages but wasn't marked done → keep it visible under "Ongoing threads," tag `unresolved: true`
 - If the user snoozed it yesterday → restore it today, unsnoozed
 
-### Step 5 — Render the artifact
+### Step 6 — Render the artifact
 
 The artifact is a single self-contained HTML page. Layout, top to bottom:
 
 1. **Top bar** — title "Daily Briefing", today's date, live clock (auto-updates), dark-mode toggle, manual refresh button
-2. **TL;DR** — 2–3 sentence summary of the day in a soft callout box
-3. **Stat tiles** — `All` / `P1` / `P2` / `P3` counts; clicking a tile filters the view below
-4. **Filter bar** — search input, "Hide done" toggle, "Hide snoozed" toggle (on by default)
-5. **🔴 P1 section** — full cards with: checkbox, title, sender + source, time estimate, body, sub-action checklist, deep links (Teams thread, Outlook email, ADO work item), snooze + escalate buttons. Carry-over items get a small "↻ since [date]" badge.
-6. **🟠 P2 section** — same card structure, slightly tighter
-7. **🟡 P3 section** — compact list, one line per item: sender · short description · timestamp
-8. **🔁 Ongoing threads** — unresolved carry-overs that didn't appear in today's new messages
-9. **Footer** — last refresh timestamp, keyboard shortcuts hint
+2. **TL;DR** — 2–3 sentence summary in a soft callout. Include the *shape of the day* — e.g. "4 unblocks, 2 responds, 0 decides. Reactive day." or "Heavy review day, no fires."
+3. **Stat tiles** — `All` / `🔥 Unblock` / `↩️ Respond` / `⚖️ Decide` / `👁 Review` / `📰 Aware`. Each tile shows count + estimated time-to-clear. Clicking filters the view below.
+4. **Filter bar** — search input, "Hide done" toggle, "Hide Aware" toggle (off by default), "Hide snoozed" toggle (on by default)
+5. **🔥 Unblock section** — full cards: checkbox, title, sender + source, urgency badges, body, sub-action checklist, deep links (Teams thread, Outlook email, ADO work item), snooze + escalate buttons
+6. **↩️ Respond section** — same card structure
+7. **⚖️ Decide section** — same card structure
+8. **👁 Review section** — same card structure, slightly tighter (these are usually less time-sensitive)
+9. **📰 Aware section** — compact list, one line per item: sender · short description · timestamp. No checkboxes; this lane is read-only.
+10. **🔁 Ongoing threads** — unresolved carry-overs that didn't appear in today's new messages
+11. **Footer** — last refresh timestamp, keyboard shortcuts hint
+
+If a lane has zero items, hide its section entirely. The TL;DR should still mention the absence ("0 decides today").
 
 **Styling:**
 - System font stack (`-apple-system, "Inter", "Segoe UI", system-ui`)
 - Light neutral background; soft borders; generous whitespace
-- Priority colors as small swatches and accent pips — **not** full-color backgrounds
+- Each lane gets a small accent color (swatch in the section heading, pip on each card):
+  - 🔥 Unblock → warm orange
+  - ↩️ Respond → muted blue
+  - ⚖️ Decide → muted purple
+  - 👁 Review → muted green
+  - 📰 Aware → neutral gray
+- Urgency badges are pill-shaped, small, semibold:
+  - 🚨 customer-impacting → red text on light red bg
+  - 🔴 hot → red text on transparent
+  - ⏱ time estimate → muted text on subtle bg
+  - ↻ carry-over → blue text with "↻ since [date]"
+- Colors are *accents only* — never full-color card backgrounds
 - Dark mode that respects `prefers-color-scheme` on first load and persists user preference
-- Responsive: collapses cleanly under 720px
+- Responsive: stat tiles wrap to 2 rows under 720px; sections collapse cleanly
 
 **Interactivity (all client-state in `localStorage` keyed by `briefing-state-YYYY-MM-DD`):**
 - Card checkbox → marks done; strikethrough + dim
 - Sub-action checkboxes → strike individual action items
 - Snooze button → hides card behind "Hide snoozed" toggle
-- Escalate button → red flag marker; carries into tomorrow with priority
+- Escalate button → 🚩 badge added; carries into tomorrow with the flag preserved
 - Search → filters across title, sender, body
-- Stat tiles → priority filter
-- Keyboard: `t` theme · `/` focus search · `shift+R` reset day · `j`/`k` navigate cards
+- Stat tiles → lane filter
+- Keyboard: `t` theme · `/` focus search · `shift+R` reset day · `j`/`k` navigate cards · `1`–`5` jump to lane
 
 At the end of the HTML body, embed a `<script type="application/json" id="briefing-state">…</script>` block containing today's items and the last-14-days log so the next refresh can read it.
 
-### Step 6 — Style rules
+### Step 7 — Style rules
 
 - Sender names: full where available, not email addresses
 - Consolidate multiple messages from the same person into one card
-- Don't render Noise items in the artifact
+- Don't render Skip / noise items in the artifact
 - The artifact is the deliverable — no markdown summary outside it
 
 ---
@@ -100,18 +129,29 @@ At the end of the HTML body, embed a `<script type="application/json" id="briefi
 
 Build the artifact from scratch. Render today's data. Initialize the embedded state block with today's items + an empty 14-day log.
 
-## Refresh behavior ("refresh briefing" or re-opening the conversation)
+## Refresh behavior
 
-Update the artifact in place:
+When I say "refresh briefing" or re-open the conversation:
 1. Re-fetch from Outlook + Teams via MCP
-2. Re-prioritize using the same rules
-3. Preserve client-side state (done / snoozed lives in the user's localStorage — don't touch it)
+2. Re-categorize using the action-verb rules
+3. Preserve client-side state (done / snoozed lives in localStorage — don't touch it)
 4. Update the embedded JSON state block: append today's run to the 14-day log, prune anything older
 
 ---
 
 ## When to ask vs. when to act
 
-- Ambiguous category (P1 vs. P2)? Pick the higher tier and note your reasoning in the card's body.
-- Outlook or Teams connector returns nothing? Don't fabricate items — render the empty state honestly with a note about the time window searched.
-- A user message comes in like "draft a reply to item 2"? Treat that as a one-shot task in the conversation; don't modify the artifact unless I ask.
+- Ambiguous lane (e.g. is this a Respond or a Decide?) → pick the higher-effort lane (Decide > Respond > Review > Unblock > Aware when in doubt — favor calling out that I need to think, not just react)
+- Ambiguous urgency? Default to no 🚨/🔴 badge; only apply them when the message itself signals incident / customer / escalation
+- Connector returns nothing? Don't fabricate items — render the empty state honestly with a note about the time window searched
+- A user message like "draft a reply to item 2"? Treat it as a one-shot task in the conversation; don't modify the artifact unless I ask
+
+---
+
+## Why this scheme (in case future-you wonders)
+
+P1/P2/P3 mashes urgency and work-type together. Sorting by **verb** instead:
+- Tells me the *shape* of my day (lots of responds = reactive; lots of decides = shaping work)
+- Lets me batch similar work (knock out responds in one sitting; do reviews when fuzzy; save decides for sharp moments)
+- Surfaces imbalance (4 responds and 0 decides is a real signal worth seeing)
+- Decouples "is this urgent?" from "is this hard?" — both stay visible, neither hides the other
